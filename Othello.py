@@ -1,8 +1,12 @@
+from RL import QLearningAgent
+import numpy as np
+
 class ThreePlayerOthello:
     def __init__(self):
         self.board = self.create_board()
         self.players = ["A", "B", "C"]
         self.current_player_index = 0
+        self.rl_agent = QLearningAgent(state_size=11*11, action_size=11*11, epsilon=0.1)
 
     def create_board(self):
         board = [[" " for _ in range(11)] for _ in range(11)]
@@ -77,29 +81,45 @@ class ThreePlayerOthello:
                 if cell in counts:
                     counts[cell] += 1
         return counts
-
+    
     def play_game(self):
         while not self.game_over():
             self.print_board()
             player = self.players[self.current_player_index]
             print(f"Player {player}'s turn.")
             moves = self.valid_moves(player)
-            if not moves:
-                print(f"No valid moves for {player}, skipping.")
-            else:
-                print("Valid moves:", moves)
-                choice = None
-                while choice not in moves:
-                    user_input = input("Enter row,col for your move (e.g. 4,5): ")
-                    try:
-                        r, c = map(int, user_input.split(","))
-                        if (r, c) in moves:
-                            choice = (r, c)
-                        else:
-                            print("Invalid move. Try again.")
-                    except ValueError:
-                        print("Invalid input. Try again.")
-                self.make_move(choice[0], choice[1], player)
+            
+            if player == "C":  # RL agent's turn
+                if moves:
+                    state = np.array([self.get_numeric_state()])
+                    valid_actions = [row * 11 + col for row, col in moves]
+                    action = self.rl_agent.get_action(state, valid_actions)
+                    row, col = divmod(action, 11)
+                    self.make_move(row, col, player)
+                    reward = self.get_reward(player)
+                    next_state = np.array([self.get_numeric_state()])
+                    done = self.game_over()
+                    self.rl_agent.update(state, action, reward, next_state, done)
+                else:
+                    print("Invalid move by RL agent. Skipping turn.")
+            else:  # Human player's turn
+                if not moves:
+                    print(f"No valid moves for {player}, skipping.")
+                else:
+                    print("Valid moves:", moves)
+                    choice = None
+                    while choice not in moves:
+                        user_input = input("Enter row,col for your move (e.g. 4,5): ")
+                        try:
+                            r, c = map(int, user_input.split(","))
+                            if (r, c) in moves:
+                                choice = (r, c)
+                            else:
+                                print("Invalid move. Try again.")
+                        except ValueError:
+                            print("Invalid input. Try again.")
+                    self.make_move(choice[0], choice[1], player)
+
             self.current_player_index = (self.current_player_index + 1) % 3
 
         self.print_board()
@@ -108,6 +128,45 @@ class ThreePlayerOthello:
         print("Scores:", final_counts)
         winner = max(final_counts, key=final_counts.get)
         print(f"Winner is Player {winner} with {final_counts[winner]} disks!")
+
+    def get_numeric_state(self):
+        return np.array([[0 if cell == " " else ord(cell) - ord("A") + 1 for cell in row] for row in self.board])
+
+    def get_reward(self, player):
+        counts = self.count_disks()
+        return counts[player] - max(counts[p] for p in self.players if p != player)
+
+
+    # def play_game(self):
+    #     while not self.game_over():
+    #         self.print_board()
+    #         player = self.players[self.current_player_index]
+    #         print(f"Player {player}'s turn.")
+    #         moves = self.valid_moves(player)
+    #         if not moves:
+    #             print(f"No valid moves for {player}, skipping.")
+    #         else:
+    #             print("Valid moves:", moves)
+    #             choice = None
+    #             while choice not in moves:
+    #                 user_input = input("Enter row,col for your move (e.g. 4,5): ")
+    #                 try:
+    #                     r, c = map(int, user_input.split(","))
+    #                     if (r, c) in moves:
+    #                         choice = (r, c)
+    #                     else:
+    #                         print("Invalid move. Try again.")
+    #                 except ValueError:
+    #                     print("Invalid input. Try again.")
+    #             self.make_move(choice[0], choice[1], player)
+    #         self.current_player_index = (self.current_player_index + 1) % 3
+
+    #     self.print_board()
+    #     final_counts = self.count_disks()
+    #     print("Game Over!")
+    #     print("Scores:", final_counts)
+    #     winner = max(final_counts, key=final_counts.get)
+    #     print(f"Winner is Player {winner} with {final_counts[winner]} disks!")
 
 if __name__ == "__main__":
     game = ThreePlayerOthello()
