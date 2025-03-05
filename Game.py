@@ -1,6 +1,6 @@
-import test2, test1
+import test2, HexBoard
 
-matrix = test1.generate_generalized_matrix(8, 15, 7)
+matrix = HexBoard.generate_generalized_matrix(8, 15, 7)
 board = test2.generate_matrix()
 board[7][6] = 2
 board[7][8] = 2

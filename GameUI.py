@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
-import test1
+import HexBoard
 import test2
 
 # Initialize matrices
-matrix = test1.generate_generalized_matrix(8, 15, 7)
+matrix = HexBoard.generate_generalized_matrix(8, 15, 7)
 board = test2.generate_matrix()
 
 # Predefined board modifications
