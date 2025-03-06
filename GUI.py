@@ -7,7 +7,17 @@ import numpy as np
 CELL_SIZE = 40
 
 class OthelloGUI:
+    """
+    A class representing the graphical user interface for the Three-Player Othello game.
+    """
+
     def __init__(self, master):
+        """
+        Initialize the Othello GUI.
+
+        Args:
+            master (tk.Tk): The root window for the GUI.
+        """
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
@@ -24,10 +34,16 @@ class OthelloGUI:
         self.update_status()
 
     def update_status(self):
+        """
+        Update the status label to show the current player's turn.
+        """
         player = self.game.players[self.game.current_player_index]
         self.status_label.config(text=f"Player {player}'s turn")
 
     def draw_board(self):
+        """
+        Draw the current state of the Othello board on the canvas.
+        """
         self.canvas.delete("all")
         for r in range(11):
             for c in range(11):
@@ -50,8 +66,14 @@ class OthelloGUI:
                     self.canvas.create_oval(x1+5, y1+5, x2-5, y2-5, fill=color)
     
     def handle_click(self, event):
-        """Handle a mouse-click only if current player is a human (A or B). 
-           Then let the RL agent move if it’s C’s turn."""
+        """
+        Handle a mouse click event on the game board.
+
+        This method processes moves for human players (A and B) and triggers the RL agent's turn if it's player C's turn.
+
+        Args:
+            event (tk.Event): The mouse click event.
+        """
         c = event.x // CELL_SIZE
         r = event.y // CELL_SIZE
 
@@ -76,6 +98,11 @@ class OthelloGUI:
             self.end_game()
         
     def handle_rl_agent_turn(self):
+        """
+        Handle the RL agent's (player C) turn.
+
+        This method allows the RL agent to make moves until it's no longer its turn or the game is over.
+        """
         while self.game.players[self.game.current_player_index] == "C" and not self.game.game_over():
             moves = self.game.valid_moves("C")
             if not moves:
@@ -123,15 +150,22 @@ class OthelloGUI:
     #         self.update_status()
 
     def end_game(self):
+        """
+        End the game and display the winner.
+
+        This method shows a message box with the winning player and their score.
+        """
         counts = self.game.count_disks()
         winner = max(counts, key=counts.get)
         messagebox.showinfo("Game Over", f"Player {winner} wins with {counts[winner]} disks!")
 
 def main():
+    """
+    The main function to run the Othello GUI application.
+    """
     root = tk.Tk()
     OthelloGUI(root)
     root.mainloop()
 
 if __name__ == "__main__":
     main()
-    

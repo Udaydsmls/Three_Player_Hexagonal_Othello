@@ -2,13 +2,26 @@ from RL import QLearningAgent
 import numpy as np
 
 class ThreePlayerOthello:
+    """
+    A class representing the Three-Player Othello game.
+    """
+
     def __init__(self):
+        """
+        Initialize the Othello game board and players.
+        """
         self.board = self.create_board()
         self.players = ["A", "B", "C"]
         self.current_player_index = 0
         self.rl_agent = QLearningAgent(state_size=11*11, action_size=11*11, epsilon=0.1)
 
     def create_board(self):
+        """
+        Create and return the initial game board.
+
+        Returns:
+            list: A 2D list representing the 11x11 game board with initial piece positions.
+        """
         board = [[" " for _ in range(11)] for _ in range(11)]
         board[4][4] = "A" 
         board[4][5] = "C"  
@@ -22,18 +35,48 @@ class ThreePlayerOthello:
         return board
 
     def print_board(self):
+        """
+        Print the current state of the game board to the console.
+        """
         print("   " + " ".join(str(i) for i in range(11)))
         for i, row in enumerate(self.board):
             print(f"{i:2} " + " ".join(row))
 
     def in_bounds(self, r, c):
+        """
+        Check if a given position is within the board boundaries.
+
+        Args:
+            r (int): Row index.
+            c (int): Column index.
+
+        Returns:
+            bool: True if the position is within bounds, False otherwise.
+        """
         return 0 <= r < 11 and 0 <= c < 11
 
     def get_opponents(self, current_player):
-        # For flipping, all disks that are not current_player are flippable
+        """
+        Get the list of opponent players for the current player.
+
+        Args:
+            current_player (str): The current player's identifier.
+
+        Returns:
+            list: A list of opponent player identifiers.
+        """
         return [p for p in ["A", "B", "C"] if p != current_player]
 
     def valid_moves(self, player):
+        """
+        Get all valid moves for the given player.
+
+        Args:
+            player (str): The player's identifier.
+
+        Returns:
+            list: A list of tuples representing valid move positions (row, column).
+        """
         moves = []
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
         for r in range(11):
@@ -54,6 +97,14 @@ class ThreePlayerOthello:
         return moves
 
     def make_move(self, r, c, player):
+        """
+        Make a move for the given player at the specified position.
+
+        Args:
+            r (int): Row index of the move.
+            c (int): Column index of the move.
+            player (str): The player's identifier.
+        """
         self.board[r][c] = player
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
         for dr, dc in directions:
@@ -69,12 +120,24 @@ class ThreePlayerOthello:
                     self.board[rr][cc] = player
 
     def game_over(self):
+        """
+        Check if the game is over.
+
+        Returns:
+            bool: True if the game is over, False otherwise.
+        """
         for p in ["A", "B", "C"]:
             if self.valid_moves(p):
                 return False
         return True
 
     def count_disks(self):
+        """
+        Count the number of disks for each player.
+
+        Returns:
+            dict: A dictionary with player identifiers as keys and disk counts as values.
+        """
         counts = {"A": 0, "B": 0, "C": 0}
         for row in self.board:
             for cell in row:
@@ -130,12 +193,26 @@ class ThreePlayerOthello:
         print(f"Winner is Player {winner} with {final_counts[winner]} disks!")
 
     def get_numeric_state(self):
+        """
+        Convert the current board state to a numeric representation.
+
+        Returns:
+            numpy.array: A 2D numpy array representing the board state numerically.
+        """
         return np.array([[0 if cell == " " else ord(cell) - ord("A") + 1 for cell in row] for row in self.board])
 
     def get_reward(self, player):
+        """
+        Calculate the reward for the given player based on the current board state.
+
+        Args:
+            player (str): The player's identifier.
+
+        Returns:
+            int: The calculated reward value.
+        """
         counts = self.count_disks()
         return counts[player] - max(counts[p] for p in self.players if p != player)
-
 
     # def play_game(self):
     #     while not self.game_over():
