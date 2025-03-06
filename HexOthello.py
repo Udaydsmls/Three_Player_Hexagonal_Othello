@@ -93,9 +93,9 @@ class ThreePlayerOthello:
             if player == "C ":
                 if moves:
                     state = np.array([self.get_numeric_state()])
-                    valid_actions = [row * 15 + col for row, col in moves]
+                    valid_actions = [row * 22 + col for row, col in moves]
                     action = self.rl_agent.get_action(state, valid_actions)
-                    row, col = divmod(action, 15)
+                    row, col = divmod(action, 22)
                     self.make_move(row, col, player)
                     reward = self.get_reward(player)
                     next_state = np.array([self.get_numeric_state()])
@@ -138,7 +138,6 @@ class ThreePlayerOthello:
     def get_reward(self, player):
         counts = self.count_disks()
         return counts[player] - max(counts[p] for p in self.players if p != player)
-
 
 if __name__ == "__main__":
     game = ThreePlayerOthello()

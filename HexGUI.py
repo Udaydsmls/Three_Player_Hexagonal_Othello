@@ -84,9 +84,9 @@ class OthelloGUI:
                 break
 
             state = np.array([self.game.get_numeric_state()])
-            valid_actions = [row * 15 + col for row, col in moves]
+            valid_actions = [row * 22 + col for row, col in moves]
             action = self.game.rl_agent.get_action(state, valid_actions)
-            row, col = divmod(action, 15)
+            row, col = divmod(action, 22)
 
             self.game.make_move(row, col, "C ")
             reward = self.game.get_reward("C ")
