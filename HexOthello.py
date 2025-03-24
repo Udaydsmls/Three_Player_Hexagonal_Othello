@@ -1,6 +1,6 @@
 from HexBoard import generate_generalized_matrix
 import numpy as np
-from RL import QLearningAgent
+# from RL_train import OthelloQLearningAgent
 import random
 
 class ThreePlayerOthello:
@@ -8,7 +8,7 @@ class ThreePlayerOthello:
         self.board = self.create_board()
         self.players = ["A ", "B ", "C "]
         self.current_player_index = 0
-        self.rl_agent = QLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=0.1)
+        # self.rl_agent = OthelloQLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=1, decay_rate=0.99, gamma=0.9)
 
     def create_board(self):
         board = generate_generalized_matrix(8, 15, 7)
@@ -32,7 +32,6 @@ class ThreePlayerOthello:
         return 0 <= r < 15 and 0 <= c < 22
 
     def get_opponents(self, current_player):
-        # For flipping, all disks that are not current_player are flippable
         return [p for p in ["A ", "B ", "C "] if p != current_player]
 
     def valid_moves(self, player):
@@ -94,104 +93,29 @@ class ThreePlayerOthello:
         self.players = ["A ", "B ", "C "]
         self.current_player_index = 0
 
-    # def play_game(self):
-    #     while not self.game_over():
-    #         self.print_board()
-    #         player = self.players[self.current_player_index]
-    #         print(f"Player {player}'s turn.")
-    #         moves = self.valid_moves(player)
-
-    #         if player == "C ":
-    #             if moves:
-    #                 state = np.array([self.get_numeric_state()])
-    #                 valid_actions = [row * 22 + col for row, col in moves]
-    #                 action = self.rl_agent.get_action(state, valid_actions)
-    #                 row, col = divmod(action, 22)
-    #                 self.make_move(row, col, player)
-    #                 reward = self.get_reward(player)
-    #                 next_state = np.array([self.get_numeric_state()])
-    #                 done = self.game_over()
-    #                 self.rl_agent.update(state, action, reward, next_state, done)
-    #             else:
-    #                 print("Invalid move by RL agent. Skipping turn.")
-
-    #         else:
-    #             if not moves:
-    #                 print(f"No valid moves for {player}, skipping.")
-    #             else:
-    #                 print("Valid moves:", moves)
-    #                 choice = None
-    #                 while choice not in moves:
-    #                     user_input = input("Enter row,col for your move (e.g. 4,5): ")
-    #                     try:
-    #                         r, c = map(int, user_input.split(","))
-    #                         if (r, c) in moves:
-    #                             choice = (r, c)
-    #                         else:
-    #                             print("Invalid move. Try again.")
-    #                     except ValueError:
-    #                         print("Invalid input. Try again.")
-    #                 self.make_move(choice[0], choice[1], player)
-
-    #         self.current_player_index = (self.current_player_index + 1) % 3
-
-    #     self.print_board()
-    #     final_counts = self.count_disks()
-    #     print("Game Over!")
-    #     print("Scores:", final_counts)
-    #     winner = max(final_counts, key=final_counts.get)
-    #     print(f"Winner is Player {winner} with {final_counts[winner]} disks!")
-
-    def play_game(self):
-        while not self.game_over():
-            self.print_board()
-            player = self.players[self.current_player_index]
-            print(f"Player {player}'s turn.")
-            moves = self.valid_moves(player)
-            
-            if player == "A ": # Random player
-                if moves:
-                    move = random.choice(moves)
-                    self.make_move(move[0], move[1], player)
-                else:
-                    print(f"No valid moves for {player}, skipping.")
-            elif player == "B ": # Hardcoded player - first valid move
-                if moves:
-                    move = moves[0]  # Simply take the first valid move
-                    self.make_move(move[0], move[1], player)
-                else:
-                    print(f"No valid moves for {player}, skipping.")
-            else: # RL agent (player C)
-                if moves:
-                    state = np.array([self.get_numeric_state()])
-                    valid_actions = [row * 22 + col for row, col in moves]
-                    action = self.rl_agent.get_action(state, valid_actions)
-                    row, col = divmod(action, 22)
-                    self.make_move(row, col, player)
-                    reward = self.get_reward(player)
-                    next_state = np.array([self.get_numeric_state()])
-                    done = self.game_over()
-                    self.rl_agent.update(state, action, reward, next_state, done)
-                else:
-                    print(f"No valid moves for {player}, skipping.")
-                    
-            self.current_player_index = (self.current_player_index + 1) % 3
-
-        self.print_board()
-        final_counts = self.count_disks()
-        print("Game Over!")
-        print("Scores:", final_counts)
-        winner = max(final_counts, key=final_counts.get)
-        print(f"Winner is Player {winner} with {final_counts[winner]} disks!")
-
-
     def get_numeric_state(self):
         return np.array(
             [[0 if cell == "  " else ord(cell.split()[0]) - ord("A") + 1 for cell in row] for row in self.board])
 
+    # def get_reward(self, player):
+    #     counts = self.count_disks()
+    #     return counts[player] - max(counts[p] for p in self.players if p != player)
+
     def get_reward(self, player):
         counts = self.count_disks()
-        return counts[player] - max(counts[p] for p in self.players if p != player)
+        disk_reward = counts[player] - max(counts[p] for p in self.players if p != player)
+
+        if self.game_over() and counts[player] == max(counts.values()):
+            win_reward = 100
+        else:
+            win_reward = 0
+        
+        if self.game_over() and counts[player] != max(counts.values()):
+            loss_penalty = -50 
+        else:
+            loss_penalty = 0
+        
+        return disk_reward + win_reward + loss_penalty
 
 if __name__ == "__main__":
     game = ThreePlayerOthello()

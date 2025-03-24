@@ -1,24 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox
-from RL import QLearningAgent
 from HexOthello import ThreePlayerOthello
 import numpy as np
 import random
+from RL_train import OthelloQLearningAgent
 
 CELL_SIZE = 40
-
 
 class OthelloGUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
-        # self.game.rl_agent = QLearningAgent(state_size=15 * 22, action_size=15 * 22)
-        self.game.rl_agent_c = QLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=0.1)
+        self.game.rl_agent_c = OthelloQLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=0.1, decay_rate=0.999, gamma=0.9)
+        self.game.rl_agent_c.load_q_table("othello_q_table.pickle")
 
         self.canvas = tk.Canvas(self.master, width=22 * CELL_SIZE, height=15 * CELL_SIZE)
         self.canvas.pack()
-        # self.canvas.bind("<Button-1>", self.handle_click)
 
         self.status_label = tk.Label(self.master, text="", font=("Arial", 14))
         self.status_label.pack()
@@ -55,68 +53,6 @@ class OthelloGUI:
                         color = "yellow"
                     self.canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=color)
 
-    # def handle_click(self, event):
-    #     c = event.x // CELL_SIZE
-    #     r = event.y // CELL_SIZE
-
-    #     current_player = self.game.players[self.game.current_player_index]
-    #     moves = self.game.valid_moves(current_player)
-
-    #     if current_player != "C ":
-    #         if (r, c) in moves:
-    #             self.game.make_move(r, c, current_player)
-    #             self.game.current_player_index = (self.game.current_player_index + 1) % 3
-    #         else:
-    #             print("Invalid move. Please try again.")
-
-    #     self.handle_rl_agent_turn()
-    #     self.draw_board()
-
-
-    #     if not self.game.game_over():
-    #         self.update_status()
-    #     else:
-    #         self.end_game()
-
-    # def handle_rl_agent_turn(self):
-    #     while self.game.players[self.game.current_player_index] == "C " and not self.game.game_over():
-    #         moves = self.game.valid_moves("C ")
-    #         if not moves:
-    #             self.game.current_player_index = (self.game.current_player_index + 1) % 3
-    #             break
-
-    #         state = np.array([self.game.get_numeric_state()])
-    #         valid_actions = [row * 22 + col for row, col in moves]
-    #         action = self.game.rl_agent.get_action(state, valid_actions)
-    #         row, col = divmod(action, 22)
-
-    #         self.game.make_move(row, col, "C ")
-    #         reward = self.game.get_reward("C ")
-    #         next_state = np.array([self.game.get_numeric_state()])
-    #         done = self.game.game_over()
-    #         self.game.rl_agent.update(state, action, reward, next_state, done)
-    #         self.game.current_player_index = (self.game.current_player_index + 1) % 3
-    #         self.draw_board()
-    #         self.update_status()
-
-    # def handle_click(self, event):
-    #     if self.game.game_over():
-    #         self.end_game()
-    #         return
-        
-    # # Handle random player (A) first
-    #     if self.game.players[self.game.current_player_index] == "A ":
-    #         self.handle_random_player_turn()
-        
-    # # Then handle RL agent turns (B and C)
-    #     self.handle_rl_agent_turns()
-    
-    #     self.draw_board()
-    #     if not self.game.game_over():
-    #         self.update_status()
-    #     else:
-    #         self.end_game()
-
     def handle_random_player_turn(self):
         moves = self.game.valid_moves("A ")
         if moves:
@@ -139,10 +75,10 @@ class OthelloGUI:
         row, col = divmod(action, 22)
         
         self.game.make_move(row, col, player)
-        reward = self.game.get_reward(player)
-        next_state = np.array([self.game.get_numeric_state()])
-        done = self.game.game_over()
-        self.game.rl_agent_c.update(state, action, reward, next_state, done)
+        # reward = self.game.get_reward(player)
+        # next_state = np.array([self.game.get_numeric_state()])
+        # done = self.game.game_over()
+        # self.game.rl_agent_c.update(state, action, reward, next_state, done)
         
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
