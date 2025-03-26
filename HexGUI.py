@@ -12,10 +12,10 @@ class OthelloGUI:
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
-        self.game.rl_agent_c = OthelloQLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=0.1, decay_rate=0.999, gamma=0.9)
+        self.game.rl_agent_c = OthelloQLearningAgent(state_size=13 * 19, action_size=13 * 19, epsilon=0.1, decay_rate=0.999, gamma=0.9)
         self.game.rl_agent_c.load_q_table("othello_q_table.pickle")
 
-        self.canvas = tk.Canvas(self.master, width=22 * CELL_SIZE, height=15 * CELL_SIZE)
+        self.canvas = tk.Canvas(self.master, width=19 * CELL_SIZE, height=13 * CELL_SIZE)
         self.canvas.pack()
 
         self.status_label = tk.Label(self.master, text="", font=("Arial", 14))
@@ -31,8 +31,8 @@ class OthelloGUI:
 
     def draw_board(self):
         self.canvas.delete("all")
-        for r in range(15):
-            for c in range(22):
+        for r in range(13):
+            for c in range(19):
                 x1 = c * CELL_SIZE
                 y1 = r * CELL_SIZE
                 x2 = x1 + CELL_SIZE
@@ -69,10 +69,10 @@ class OthelloGUI:
             self.game.current_player_index = (self.game.current_player_index + 1) % 3
             return
         
-        state = np.array([self.game.get_numeric_state()])
-        valid_actions = [row * 22 + col for row, col in moves]
+        state = np.array([self.game.get_numeric_state("C ")])
+        valid_actions = [row * 19 + col for row, col in moves]
         action = self.game.rl_agent_c.get_action(state, valid_actions)
-        row, col = divmod(action, 22)
+        row, col = divmod(action, 19)
         
         self.game.make_move(row, col, player)
         # reward = self.game.get_reward(player)
