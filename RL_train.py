@@ -3,7 +3,7 @@ import random
 import pickle
 from HexOthello import ThreePlayerOthello
 from scipy.sparse import dok_matrix
-from hashlib import sha1
+from hashlib import sha1, sha256
 
 class OthelloQLearningAgent:
     def __init__(self, state_size, action_size, epsilon=1.0, decay_rate=0.9998, gamma=0.9):
@@ -20,7 +20,7 @@ class OthelloQLearningAgent:
 
     def get_state_key(self, state):
         state_bytes = state.tobytes()
-        state_hash = sha1(state_bytes).hexdigest()
+        state_hash = sha256(state_bytes).hexdigest()
         return state_hash
         
     def get_action(self, state, valid_actions):
@@ -141,8 +141,8 @@ class OthelloQLearningAgent:
             # if episode % 100 == 0:
             #     print(f"Episode {episode}/{num_episodes}, Epsilon: {agent.epsilon:.4f}")
 
-            if episode > 0 and episode % 100 == 0:
-                avg_reward = sum(total_rewards[-100:]) / min(len(total_rewards), 100)
+            if episode > 0 and episode % 1000 == 0:
+                avg_reward = sum(total_rewards[-1000:]) / min(len(total_rewards), 1000)
                 print(f"Episode {episode}/{num_episodes}, Epsilon: {agent.epsilon:.4f}, Avg Reward: {avg_reward:.2f}")
         
         print(f"RL Agent Win Rate: {rl_wins / num_episodes * 100:.2f}%")
@@ -151,4 +151,4 @@ class OthelloQLearningAgent:
         return agent
 
 if __name__ == "__main__":
-    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=1000, gamma=0.9, epsilon=1, decay_rate=0.996)
+    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=100000, gamma=0.98, epsilon=1, decay_rate=0.99996)

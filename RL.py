@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from hashlib import sha1
 
 class QLearningAgent:
     """
@@ -34,7 +35,9 @@ class QLearningAgent:
         Returns:
             tuple: A hashable representation of the state.
         """
-        return tuple(state.flatten())
+        state_bytes = state.tobytes()
+        state_hash = sha1(state_bytes).hexdigest()
+        return state_hash
 
     def get_action(self, state, valid_moves):
         """

@@ -99,7 +99,7 @@ class ThreePlayerOthello:
 
     def get_numeric_state(self, player):
         return np.array(
-            [[1 if cell == player else (0 if cell == "  " else 2) for cell in row] for row in self.board]
+            [[1 if cell == player else (0 if cell == "  " else (3 if cell == "X " else 2)) for cell in row] for row in self.board]
         )
 
     def get_reward(self, player):
