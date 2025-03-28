@@ -12,7 +12,7 @@ class OthelloGUI:
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
-        self.game.rl_agent_c = OthelloQLearningAgent(state_size=13 * 19, action_size=13 * 19, epsilon=0.1, decay_rate=0.999, gamma=0.9)
+        self.game.rl_agent_c = OthelloQLearningAgent(state_size=13 * 19, action_size=13 * 19, epsilon=0.115, decay_rate=0.999, gamma=0.9)
         self.game.rl_agent_c.load_q_table("othello_q_table.pickle")
 
         self.canvas = tk.Canvas(self.master, width=19 * CELL_SIZE, height=13 * CELL_SIZE)
@@ -72,14 +72,8 @@ class OthelloGUI:
         state = np.array([self.game.get_numeric_state("C ")])
         valid_actions = [row * 19 + col for row, col in moves]
         action = self.game.rl_agent_c.get_action(state, valid_actions)
-        row, col = divmod(action, 19)
-        
+        row, col = divmod(action, 19)    
         self.game.make_move(row, col, player)
-        # reward = self.game.get_reward(player)
-        # next_state = np.array([self.game.get_numeric_state()])
-        # done = self.game.game_over()
-        # self.game.rl_agent_c.update(state, action, reward, next_state, done)
-        
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
     def handle_hardcoded_player_turn(self):
