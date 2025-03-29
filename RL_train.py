@@ -14,9 +14,6 @@ class OthelloQLearningAgent:
         self.gamma = gamma
         self.q_table = {}
         self.num_updates = {}
-        
-    # def get_state_key(self, state):
-    #     return tuple(state.flatten())
 
     def get_state_key(self, state):
         state_bytes = state.tobytes()
@@ -27,14 +24,12 @@ class OthelloQLearningAgent:
         state_key = self.get_state_key(state)
         
         if state_key not in self.q_table:
-            # self.q_table[state_key] = np.zeros(self.action_size)
             self.q_table[state_key] = dok_matrix((1, self.action_size), dtype=np.float64)
             self.num_updates[state_key] = np.zeros(self.action_size)
         
         if np.random.random() < self.epsilon:
             return random.choice(valid_actions)
         else:
-            # valid_q_values = [self.q_table[state_key][action] for action in valid_actions]
             q_values = self.q_table[state_key].todense().A1
             valid_q_values = [q_values[action] for action in valid_actions]
             max_value_index = np.argmax(valid_q_values)
@@ -45,11 +40,9 @@ class OthelloQLearningAgent:
         next_state_key = self.get_state_key(next_state)
         
         if state_key not in self.q_table:
-            # self.q_table[state_key] = np.zeros(self.action_size)
             self.q_table[state_key] = dok_matrix((1, self.action_size), dtype=np.float64)
             self.num_updates[state_key] = np.zeros(self.action_size)
         if next_state_key not in self.q_table:
-            # self.q_table[next_state_key] = np.zeros(self.action_size)
             self.q_table[next_state_key] = dok_matrix((1, self.action_size), dtype=np.float64)
             self.num_updates[next_state_key] = np.zeros(self.action_size)
         
@@ -62,10 +55,8 @@ class OthelloQLearningAgent:
             target = reward
         else:
             next_q_dense = self.q_table[next_state_key].todense().A1
-            #target = reward + self.gamma * np.max(self.q_table[next_state_key])
             target = reward + self.gamma * np.max(next_q_dense)
         
-        # self.q_table[state_key][action] = (1 - eta) * self.q_table[state_key][action] + eta * target
         new_value = (1 - eta) * current_value + eta * target
         self.q_table[state_key][0, action] = new_value
     
@@ -102,11 +93,34 @@ class OthelloQLearningAgent:
                         move = random.choice(moves)
                         game.make_move(move[0], move[1], "A ")
                     
-                elif current_player == "B ":  
+                # elif current_player == "B ":  
+                #     moves = game.valid_moves("B ")
+                #     if moves:
+                #         move = moves[0]
+                #         game.make_move(move[0], move[1], "B ")
+
+                elif current_player == "B ":
                     moves = game.valid_moves("B ")
+                    
                     if moves:
-                        move = moves[0]
-                        game.make_move(move[0], move[1], "B ")
+                        best_move = None
+                        max_flips = -1
+                        
+                        for move in moves:
+                            r, c = move
+                            temp_board = [row[:] for row in game.board]
+                            game.make_move(r, c, "B ")
+                            
+                            flipped_pieces = sum(row.count("B ") for row in game.board) - sum(row.count("B ") for row in temp_board)
+                            
+                            game.board = temp_board 
+                            
+                            if flipped_pieces > max_flips:
+                                max_flips = flipped_pieces
+                                best_move = move
+                        
+                        if best_move:
+                            game.make_move(best_move[0], best_move[1], "B ")
                     
                 else:
                     moves = game.valid_moves("C ")
@@ -147,4 +161,4 @@ class OthelloQLearningAgent:
         return agent
 
 if __name__ == "__main__":
-    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=10000, gamma=0.95, epsilon=1, decay_rate=0.9996)
+    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=10000, gamma=0.9, epsilon=1, decay_rate=0.9996)
