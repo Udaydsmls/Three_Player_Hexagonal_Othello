@@ -161,4 +161,4 @@ class OthelloQLearningAgent:
         return agent
 
 if __name__ == "__main__":
-    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=10000, gamma=0.9, epsilon=1, decay_rate=0.9996)
+    agent = OthelloQLearningAgent.train_rl_agent(num_episodes=100000, gamma=0.9, epsilon=1, decay_rate=0.99996)
