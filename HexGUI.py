@@ -12,7 +12,7 @@ class OthelloGUI:
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
-        self.game.rl_agent_c = OthelloQLearningAgent(state_size=13 * 19, action_size=13 * 19, epsilon=0.11, decay_rate=0.999, gamma=0.9)
+        self.game.rl_agent_c = OthelloQLearningAgent(state_size=13 * 19, action_size=13 * 19, epsilon=0.1, decay_rate=0.999, gamma=0.9)
         self.game.rl_agent_c.load_q_table("othello_q_table.pickle")
 
         self.canvas = tk.Canvas(self.master, width=19 * CELL_SIZE, height=13 * CELL_SIZE)

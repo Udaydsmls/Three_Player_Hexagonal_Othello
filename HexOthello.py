@@ -1,14 +1,11 @@
 from HexBoard import generate_generalized_matrix
 import numpy as np
-# from RL_train import OthelloQLearningAgent
-import random
 
 class ThreePlayerOthello:
     def __init__(self):
         self.board = self.create_board()
         self.players = ["A ", "B ", "C "]
         self.current_player_index = 0
-        # self.rl_agent = OthelloQLearningAgent(state_size=15 * 22, action_size=15 * 22, epsilon=1, decay_rate=0.99, gamma=0.9)
 
     def create_board(self):
         board = generate_generalized_matrix(7, 13, 6)
@@ -63,16 +60,9 @@ class ThreePlayerOthello:
                 chain.append((row, col))
                 row += dr
                 col += dc
-            # If we found a chain and ended on player's disk, flip it
             if chain and self.in_bounds(row, col) and self.board[row][col] == player:
                 for rr, cc in chain:
                     self.board[rr][cc] = player
-    
-    def random_move(game, player):
-        moves = game.valid_moves(player)
-        if moves:
-            return random.choice(moves)
-        return None
 
     def game_over(self):
         for p in ["A ", "B ", "C "]:
@@ -92,10 +82,6 @@ class ThreePlayerOthello:
         self.board = self.create_board()
         self.players = ["A ", "B ", "C "]
         self.current_player_index = 0
-
-    # def get_numeric_state(self):
-    #     return np.array(
-    #         [[0 if cell == "  " else ord(cell.split()[0]) - ord("A") + 1 for cell in row] for row in self.board])
 
     def get_numeric_state(self, player):
         return np.array(
@@ -117,7 +103,3 @@ class ThreePlayerOthello:
             loss_penalty = 0
         
         return disk_reward + win_reward + loss_penalty
-
-if __name__ == "__main__":
-    game = ThreePlayerOthello()
-    game.play_game()
