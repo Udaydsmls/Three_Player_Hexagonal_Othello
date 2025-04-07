@@ -76,13 +76,6 @@ class OthelloGUI:
         self.game.make_move(row, col, player)
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
-    # def handle_hardcoded_player_turn(self):
-    #     moves = self.game.valid_moves("B ")
-    #     if moves:
-    #         move = moves[0]
-    #         self.game.make_move(move[0], move[1], "B ")
-    #     self.game.current_player_index = (self.game.current_player_index + 1) % 3
-
     def handle_greedy_player_turn(self):
         moves = self.game.valid_moves("B ")
         if moves:
@@ -121,7 +114,7 @@ class OthelloGUI:
             self.handle_rl_agent_turn(current_player)
         
         self.draw_board()
-        self.update_status()
+        self.master.after(600, self.update_status)
         
         if not self.game.game_over():
             self.master.after(600, self.auto_play)
