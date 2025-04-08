@@ -151,8 +151,8 @@ class OthelloQLearningAgent:
 
             agent.decay_epsilon()
 
-            if episode > 0 and episode % 100 == 0:
-                avg_reward = sum(total_rewards[-100:]) / min(len(total_rewards), 100)
+            if episode > 0 and episode % 1000 == 0:
+                avg_reward = sum(total_rewards[-1000:]) / min(len(total_rewards), 1000)
                 print(f"Episode {episode}/{num_episodes}, Epsilon: {agent.epsilon:.4f}, Avg Reward: {avg_reward:.2f}")
         
         print(f"RL Agent Win Rate: {rl_wins / num_episodes * 100:.2f}%")
