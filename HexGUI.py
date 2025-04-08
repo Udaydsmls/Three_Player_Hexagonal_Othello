@@ -119,7 +119,7 @@ class OthelloGUI:
         if not self.game.game_over():
             self.master.after(600, self.auto_play)
         else:
-            self.end_game()
+            self.master.after(600, self.end_game)
 
     def end_game(self):
         counts = self.game.count_disks()
