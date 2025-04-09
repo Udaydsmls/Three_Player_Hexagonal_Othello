@@ -2,6 +2,8 @@
 
 This project implements a three-player variant of the classic Othello board game with a Q-learning agent and a hexagonal board. 
 
+[Q-table file](https://northeastern-my.sharepoint.com/:u:/g/personal/sonawane_u_northeastern_edu/EaRR1vGvHdZKss8yaSedWScBQA3yQN-52Xq_EXCwZCRVsQ?e=qc5COk)
+
 ## Overview
 
 - **HexBoard.py**  
