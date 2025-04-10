@@ -2,7 +2,7 @@
 
 This project implements a three-player variant of the classic Othello board game with a Q-learning agent and a hexagonal board. 
 
-Download the Q-table file from the link given below: 
+Download the Q-table file from the link given here: 
 [Q-table file](https://northeastern-my.sharepoint.com/:u:/g/personal/sonawane_u_northeastern_edu/EaRR1vGvHdZKss8yaSedWScBQA3yQN-52Xq_EXCwZCRVsQ?e=qc5COk)
 
 ## Overview
