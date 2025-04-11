@@ -17,7 +17,7 @@ Download the Q-table file from the link given here:
   Contains the Q-learning agent (`OthelloQLearningAgent`) and a training routine (`train_rl_agent`). Trains a model through repeated gameplay, updates Q-table, and saves it.
 
 - **HexGUI.py**  
-  Provides a Tkinter GUI to visualize and play the game. Loads the trained Q-table to let the agent play as player **C**.
+  Provides a Tkinter GUI to visualize and play the game. Loads the trained Q-table to let the RL agent play as player **C**.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Download the Q-table file from the link given here:
    python HexGUI.py
    ```
 
-The agent is trained to control player **C**, with players **A** and **B** using random or fixed strategies. Adjust hyperparameters (epsilon, decay_rate, gamma, etc.) in `RL_train.py` or in the `OthelloQLearningAgent` constructor as desired.
+The agent is trained to control player **C**, with players **A** and **B** using random and fixed strategies respectively. Adjust hyperparameters (epsilon, decay_rate, gamma, etc.) in `RL_train.py` or in the `OthelloQLearningAgent` constructor as desired.
 
 ## Project Structure
 
