@@ -1,3 +1,11 @@
+"""
+HexGUI.py
+
+Module Description:
+This module implements a graphical user interface (GUI) for a three-player Othello game using Tkinter.
+It includes functionalities for displaying the game board, handling player turns, and displaying game status.
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 from HexOthello import ThreePlayerOthello
@@ -8,7 +16,23 @@ from RL_train import OthelloQLearningAgent
 CELL_SIZE = 40
 
 class OthelloGUI:
+    """
+    Represents the GUI for the three-player Othello game.
+
+    Attributes:
+        master (tk.Tk): The main Tkinter window.
+        game (ThreePlayerOthello): The game instance.
+        rl_agent_c (OthelloQLearningAgent): The Q-learning agent for player C.
+        canvas (tk.Canvas): The canvas for drawing the game board.
+        status_label (tk.Label): The label displaying whose turn it is.
+    """
     def __init__(self, master):
+        """
+        Initializes the GUI with the specified Tkinter window.
+
+        Parameters:
+            master (tk.Tk): The main Tkinter window.
+        """
         self.master = master
         self.master.title("Three-Player Othello")
         self.game = ThreePlayerOthello()
@@ -26,10 +50,16 @@ class OthelloGUI:
         self.master.after(1000, self.auto_play)
 
     def update_status(self):
+        """
+        Updates the status label to reflect whose turn it is.
+        """
         player = self.game.players[self.game.current_player_index]
         self.status_label.config(text=f"Player {player}'s turn")
 
     def draw_board(self):
+        """
+        Draws the current state of the game board on the canvas.
+        """
         self.canvas.delete("all")
         for r in range(13):
             for c in range(19):
@@ -54,6 +84,9 @@ class OthelloGUI:
                     self.canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=color)
 
     def handle_random_player_turn(self):
+        """
+        Handles random moves for player A.
+        """
         moves = self.game.valid_moves("A ")
         if moves:
             move = random.choice(moves)
@@ -61,6 +94,12 @@ class OthelloGUI:
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
     def handle_rl_agent_turn(self, player):
+        """
+        Handles a move for player C using the Q-learning agent.
+
+        Parameters:
+            player (str): The player for whom to handle the turn.
+        """
         if player != "C ":
             return
             
@@ -77,6 +116,9 @@ class OthelloGUI:
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
     def handle_greedy_player_turn(self):
+        """
+        Handles a greedy move for player B.
+        """
         moves = self.game.valid_moves("B ")
         if moves:
             best_move = None
@@ -100,6 +142,9 @@ class OthelloGUI:
         self.game.current_player_index = (self.game.current_player_index + 1) % 3
 
     def auto_play(self):
+        """
+        Automates the gameplay by handling each player's turn sequentially.
+        """
         if self.game.game_over():
             self.end_game()
             return
@@ -122,11 +167,17 @@ class OthelloGUI:
             self.master.after(600, self.end_game)
 
     def end_game(self):
+        """
+        Displays a message box announcing the winner when the game ends.
+        """
         counts = self.game.count_disks()
         winner = max(counts, key=counts.get)
         messagebox.showinfo("Game Over", f"Player {winner} wins with {counts[winner]} disks!")
 
 def main():
+    """
+    Starts the Tkinter event loop for the GUI.
+    """
     root = tk.Tk()
     OthelloGUI(root)
     root.mainloop()

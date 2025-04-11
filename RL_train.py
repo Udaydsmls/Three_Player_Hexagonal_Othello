@@ -1,3 +1,11 @@
+"""
+RL_train.py
+
+Module Description:
+This module implements a Q-learning agent for training a reinforcement learning model to play a three-player Othello game.
+It includes functionalities for creating the agent, training the agent through episodes, and saving/loading the Q-table.
+"""
+
 import numpy as np
 import random
 import pickle
@@ -6,7 +14,29 @@ from scipy.sparse import dok_matrix
 from hashlib import sha256
 
 class OthelloQLearningAgent:
+    """
+    Represents a Q-learning agent for playing Othello.
+
+    Attributes:
+        state_size (int): The size of the state space.
+        action_size (int): The size of the action space.
+        epsilon (float): The exploration rate.
+        decay_rate (float): The rate at which epsilon decays.
+        gamma (float): The discount factor for rewards.
+        q_table (dict): A dictionary mapping states to Q-values.
+        num_updates (dict): A dictionary tracking the number of updates for each state-action pair.
+    """
     def __init__(self, state_size, action_size, epsilon=1.0, decay_rate=0.9998, gamma=0.9):
+        """
+        Initializes the agent with specified parameters.
+
+        Parameters:
+            state_size (int): The size of the state space.
+            action_size (int): The size of the action space.
+            epsilon (float): The initial exploration rate. Defaults to 1.0.
+            decay_rate (float): The rate at which epsilon decays. Defaults to 0.9998.
+            gamma (float): The discount factor for rewards. Defaults to 0.9.
+        """
         self.state_size = state_size
         self.action_size = action_size
         self.epsilon = epsilon
@@ -16,11 +46,30 @@ class OthelloQLearningAgent:
         self.num_updates = {}
 
     def get_state_key(self, state):
+        """
+        Returns a unique key for the given state.
+
+        Parameters:
+            state (numpy.ndarray): The state of the game.
+
+        Returns:
+            str: A unique key for the state.
+        """
         state_bytes = state.tobytes()
         state_hash = sha256(state_bytes).hexdigest()
         return state_hash
         
     def get_action(self, state, valid_actions):
+        """
+        Selects an action based on the current policy.
+
+        Parameters:
+            state (numpy.ndarray): The current state of the game.
+            valid_actions (list[int]): List of valid actions.
+
+        Returns:
+            int: The selected action.
+        """
         state_key = self.get_state_key(state)
         
         if state_key not in self.q_table:
@@ -36,6 +85,16 @@ class OthelloQLearningAgent:
             return valid_actions[max_value_index]
     
     def update(self, state, action, reward, next_state, done):
+        """
+        Updates the Q-table based on the Q-learning update rule.
+
+        Parameters:
+            state (numpy.ndarray): The current state.
+            action (int): The action taken.
+            reward (float): The reward received.
+            next_state (numpy.ndarray): The next state.
+            done (bool): Whether the episode is over.
+        """
         state_key = self.get_state_key(state)
         next_state_key = self.get_state_key(next_state)
         
@@ -61,17 +120,45 @@ class OthelloQLearningAgent:
         self.q_table[state_key][0, action] = new_value
     
     def decay_epsilon(self):
+        """
+        Decreases the exploration rate.
+        """
         self.epsilon *= self.decay_rate
         
     def save_q_table(self, filename):
+        """
+        Saves the Q-table to a file.
+
+        Parameters:
+            filename (str): The filename to save the Q-table to.
+        """
         with open(filename, 'wb') as handle:
             pickle.dump(self.q_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
     def load_q_table(self, filename):
+        """
+        Loads the Q-table from a file.
+
+        Parameters:
+            filename (str): The filename to load the Q-table from.
+        """
         with open(filename, 'rb') as handle:
             self.q_table = pickle.load(handle)
 
     def train_rl_agent(num_episodes=1000, gamma=0.9, epsilon=1.0, decay_rate=0.99):
+        """
+        Trains the Q-learning agent through multiple episodes. The agent plays against random player and greedy player.
+        The training process involves updating the Q-table based on the rewards received during the game.
+
+        Parameters:
+            num_episodes (int): The number of episodes to train for. Defaults to 1000.
+            gamma (float): The discount factor. Defaults to 0.9.
+            epsilon (float): The initial exploration rate. Defaults to 1.0.
+            decay_rate (float): The rate at which epsilon decays. Defaults to 0.99.
+
+        Returns:
+            OthelloQLearningAgent: The trained agent.
+        """
         game = ThreePlayerOthello()
         agent = OthelloQLearningAgent(state_size=13*19, action_size=13*19, 
                                     epsilon=epsilon, decay_rate=decay_rate, gamma=gamma)
@@ -92,12 +179,6 @@ class OthelloQLearningAgent:
                     if moves:
                         move = random.choice(moves)
                         game.make_move(move[0], move[1], "A ")
-                    
-                # elif current_player == "B ":  
-                #     moves = game.valid_moves("B ")
-                #     if moves:
-                #         move = moves[0]
-                #         game.make_move(move[0], move[1], "B ")
 
                 elif current_player == "B ":
                     moves = game.valid_moves("B ")
